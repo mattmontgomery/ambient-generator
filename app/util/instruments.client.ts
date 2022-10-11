@@ -1,66 +1,72 @@
 import * as Tone from "tone";
-import type { PolySynthOptions, Synth } from "tone";
 
-Tone.setContext(new Tone.Context({ lookAhead: 0.1 }));
-
-export function getSynth<T extends Synth>(
-  options: Partial<PolySynthOptions<T>> = {},
-  root = Tone.PolySynth
-) {
-  return new root(options).toDestination();
-}
-
-export function play({
-  notes,
-  duration = "4n",
-  synth = defaultSynth,
-}: {
-  notes: Tone.Unit.Frequency | Tone.Unit.Frequency[];
-  octave?: number;
-  synth?: Tone.PolySynth;
-  duration?: Tone.Unit.Time | Tone.Unit.Time[];
-}) {
-  synth.triggerAttackRelease(notes, duration);
-}
-
-export function getNow() {
-  return Tone.now();
-}
-
-// const envelope = new Tone.AmplitudeEnvelope({
-//   attack: 1,
-//   attackCurve: "linear",
-//   sustain: 0.6,
-//   decay: 0.7,
-//   release: 1,
-//   releaseCurve: "linear",
-// });
+Tone.setContext(new Tone.Context({ lookAhead: 0.4 }));
 
 export const lowSynth = new Tone.MonoSynth({
-  volume: -10,
+  volume: -30,
   oscillator: {
     type: "sine",
   },
   envelope: {
-    attack: 1,
-    decay: 1,
-    sustain: 0.9,
-    release: 1,
+    attack: 10,
+    decay: 10,
+    sustain: 0.8,
+    release: 10,
   },
   filterEnvelope: {
-    attack: 0.06,
-    decay: 0.2,
+    attack: 1.06,
+    decay: 0.9,
     sustain: 0.5,
-    release: 2,
+    release: 20,
     baseFrequency: 100,
-    octaves: 7,
+    octaves: 2,
     exponent: 1.2,
   },
-}).toDestination();
+})
+  .connect(new Tone.Delay("4n").toDestination())
+  .connect(new Tone.Reverb(188).toDestination())
+  .connect(new Tone.Delay("4n").toDestination())
+  .connect(new Tone.Freeverb(0.1).toDestination())
+  .connect(new Tone.Delay("4n").toDestination())
+  .connect(new Tone.Freeverb(0.1).toDestination())
+  .connect(new Tone.Delay("4n").toDestination())
+  .connect(new Tone.Freeverb(0.1).toDestination())
+  .toDestination();
 
-export const highSynth = new Tone.DuoSynth({
+export const highSynth = new Tone.MonoSynth({
+  volume: -40,
+  oscillator: {
+    type: "sine",
+  },
+  envelope: {
+    attack: 10,
+    decay: 10,
+    sustain: 0.8,
+    release: 10,
+  },
+  filterEnvelope: {
+    attack: 1.06,
+    decay: 0.9,
+    sustain: 0.5,
+    release: 20,
+    baseFrequency: 100,
+    octaves: 2,
+    exponent: 1.2,
+  },
+})
+  .connect(new Tone.Freeverb(0.4).toDestination())
+  .connect(new Tone.Reverb(12).toDestination())
+  .connect(new Tone.Delay("32n").toDestination())
+  .connect(new Tone.Delay("32n").toDestination())
+  .connect(new Tone.Delay("16n").toDestination())
+  .connect(new Tone.Delay("32n").toDestination())
+  .connect(new Tone.Delay("32n").toDestination())
+  .connect(new Tone.Freeverb(0.8).toDestination())
+  .toDestination();
+
+export const userSynth = new Tone.DuoSynth({
   harmonicity: 1,
-  volume: -20,
+  volume: -35,
   voice0: {
     oscillator: { type: "sawtooth" },
     envelope: {
@@ -93,6 +99,13 @@ export const highSynth = new Tone.DuoSynth({
   },
   vibratoRate: 0.5,
   vibratoAmount: 0.1,
-}).toDestination();
-
-export const defaultSynth = getSynth({});
+})
+  .connect(new Tone.Freeverb(0.4).toDestination())
+  .connect(new Tone.Reverb(12).toDestination())
+  .connect(new Tone.Delay("16n").toDestination())
+  .connect(new Tone.Delay("16n").toDestination())
+  .connect(new Tone.Delay("4n").toDestination())
+  .connect(new Tone.Delay("16n").toDestination())
+  .connect(new Tone.Delay("16n").toDestination())
+  .connect(new Tone.Freeverb(0.4).toDestination())
+  .toDestination();
