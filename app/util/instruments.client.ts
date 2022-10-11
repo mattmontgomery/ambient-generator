@@ -1,6 +1,6 @@
 import * as Tone from "tone";
 
-Tone.setContext(new Tone.Context({ lookAhead: 0.4 }));
+Tone.setContext(new Tone.Context({ lookAhead: 1 }));
 
 export const lowSynth = new Tone.MonoSynth({
   volume: -30,

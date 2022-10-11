@@ -20,7 +20,11 @@ export async function perform({
   duration,
   delay,
   synth,
-}: Notey & { synth: any }): Promise<{
+}: Notey & {
+  synth: {
+    triggerAttackRelease: (note: string, duration: number) => void;
+  };
+}): Promise<{
   note: Notey;
   playNote: () => Promise<void>;
 }> {
