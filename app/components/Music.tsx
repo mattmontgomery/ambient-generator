@@ -65,7 +65,7 @@ export default function Music(props: MusicProps): React.ReactElement {
   }, [props.pusher, props.user, playUserNote]);
 
   return (
-    <div className={`grid grid-cols-12 h-full`}>
+    <div className={`h-full grid `}>
       <Looper
         duration={duration}
         enabled={loopEnabled}
@@ -95,50 +95,8 @@ export default function Music(props: MusicProps): React.ReactElement {
         }}
         synth={highSynth}
       />
-      <div className="grid gap-1 col-span-2">
-        <select
-          value={scaleName}
-          onChange={(ev) => {
-            const newScaleName = ev.target.value;
-            setScaleName(newScaleName);
-          }}
-        >
-          {Scale.names().map((opt, idx) => (
-            <option key={idx}>{opt}</option>
-          ))}
-        </select>
-        <button
-          className="bg-slate-800 text-white rounded p-4"
-          onClick={() => {
-            setLoopEnabled(!loopEnabled);
-          }}
-        >
-          {loopEnabled ? "stop repeating" : "play"} base tones
-        </button>
-        <button
-          className="bg-slate-700 text-white rounded p-4"
-          onClick={() => setChordsEnabled(!chordsEnabled)}
-        >
-          {!chordsEnabled ? "play high tones" : "stop high tones"}
-        </button>
-        <div className="p-4">
-          volume
-          <input
-            onChange={(ev) => {
-              lowSynth.set({ volume: Number(ev.target.value) });
-              highSynth.set({ volume: Number(ev.target.value) - 10 });
-              userSynth.set({ volume: Number(ev.target.value) - 10 });
-            }}
-            type="range"
-            min="-100"
-            max="-10"
-            defaultValue={0}
-            id="myRange"
-          />
-        </div>
-      </div>
       <div
-        className={`${bgColor} col-span-10 transition-colors relative duration-[${
+        className={`${bgColor} col-span-12 transition-colors relative duration-[${
           (1 / duration) * 10_000
         }ms]`}
         onMouseDown={async (ev) => {
@@ -167,6 +125,53 @@ export default function Music(props: MusicProps): React.ReactElement {
           {activeUserNotes.map((note, idx) => {
             return <Dot x={note.x} y={note.y} key={idx} />;
           })}
+        </div>
+        <div className="absolute bottom-4 right-4 color-white text-slate-200 outline-zinc-300 antialiased font-semibold text-lg">
+          {root} {scaleName}
+        </div>
+        <div className="absolute">
+          <div className="grid gap-1 col-span-2">
+            <select
+              value={scaleName}
+              onChange={(ev) => {
+                const newScaleName = ev.target.value;
+                setScaleName(newScaleName);
+              }}
+            >
+              {Scale.names().map((opt, idx) => (
+                <option key={idx}>{opt}</option>
+              ))}
+            </select>
+            <button
+              className="bg-slate-800 text-white rounded p-4"
+              onClick={() => {
+                setLoopEnabled(!loopEnabled);
+              }}
+            >
+              {loopEnabled ? "stop repeating" : "play"} base tones
+            </button>
+            <button
+              className="bg-slate-700 text-white rounded p-4"
+              onClick={() => setChordsEnabled(!chordsEnabled)}
+            >
+              {!chordsEnabled ? "play high tones" : "stop high tones"}
+            </button>
+            <div className="p-4">
+              volume
+              <input
+                onChange={(ev) => {
+                  lowSynth.set({ volume: Number(ev.target.value) - 30 });
+                  highSynth.set({ volume: Number(ev.target.value) - 30 });
+                  userSynth.set({ volume: Number(ev.target.value) - 30 });
+                }}
+                type="range"
+                min="-70"
+                max="-10"
+                defaultValue={0}
+                id="myRange"
+              />
+            </div>
+          </div>
         </div>
       </div>
     </div>
