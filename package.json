@@ -2,11 +2,12 @@
   "private": true,
   "sideEffects": false,
   "scripts": {
-    "build": "remix build",
+    "build": "run-p build:*",
+    "build:css": "tailwindcss -o ./app/tailwind.css",
+    "build:remix": "remix build",
     "dev": "run-p dev:*",
-    "dev:css": "npm run generate:css -- --watch",
+    "dev:css": "npm run build:css -- --watch",
     "dev:remix": "remix dev",
-    "generate:css": "tailwindcss -o ./app/tailwind.css",
     "start": "remix-serve build"
   },
   "dependencies": {
@@ -24,6 +25,7 @@
   "devDependencies": {
     "@remix-run/dev": "^1.7.2",
     "@remix-run/eslint-config": "^1.7.2",
+    "@remix-run/vercel": "^1.7.2",
     "@types/react": "^18.0.15",
     "@types/react-dom": "^18.0.6",
     "@types/uuid": "^8.3.4",

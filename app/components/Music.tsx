@@ -65,7 +65,7 @@ export default function Music(props: MusicProps): React.ReactElement {
   }, [props.pusher, props.user, playUserNote]);
 
   return (
-    <div className={`grid grid-cols-12 ap-2 h-full `}>
+    <div className={`grid grid-cols-12 h-full`}>
       <Looper
         duration={duration}
         enabled={loopEnabled}
@@ -95,7 +95,7 @@ export default function Music(props: MusicProps): React.ReactElement {
         }}
         synth={highSynth}
       />
-      <div className="grid gap-1 col-span-4">
+      <div className="grid gap-1 col-span-2">
         <select
           value={scaleName}
           onChange={(ev) => {
@@ -138,7 +138,7 @@ export default function Music(props: MusicProps): React.ReactElement {
         </div>
       </div>
       <div
-        className={`${bgColor} col-span-8 transition-colors relative duration-[${
+        className={`${bgColor} col-span-10 transition-colors relative duration-[${
           (1 / duration) * 10_000
         }ms]`}
         onMouseDown={async (ev) => {
