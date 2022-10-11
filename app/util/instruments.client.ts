@@ -27,10 +27,6 @@ export const lowSynth = new Tone.MonoSynth({
   .connect(new Tone.Reverb(188).toDestination())
   .connect(new Tone.Delay("4n").toDestination())
   .connect(new Tone.Freeverb(0.1).toDestination())
-  .connect(new Tone.Delay("4n").toDestination())
-  .connect(new Tone.Freeverb(0.1).toDestination())
-  .connect(new Tone.Delay("4n").toDestination())
-  .connect(new Tone.Freeverb(0.1).toDestination())
   .toDestination();
 
 export const highSynth = new Tone.MonoSynth({
@@ -56,10 +52,6 @@ export const highSynth = new Tone.MonoSynth({
 })
   .connect(new Tone.Freeverb(0.4).toDestination())
   .connect(new Tone.Reverb(12).toDestination())
-  .connect(new Tone.Delay("32n").toDestination())
-  .connect(new Tone.Delay("32n").toDestination())
-  .connect(new Tone.Delay("16n").toDestination())
-  .connect(new Tone.Delay("32n").toDestination())
   .connect(new Tone.Delay("32n").toDestination())
   .connect(new Tone.Freeverb(0.8).toDestination())
   .toDestination();
@@ -102,10 +94,6 @@ export const userSynth = new Tone.DuoSynth({
 })
   .connect(new Tone.Freeverb(0.4).toDestination())
   .connect(new Tone.Reverb(12).toDestination())
-  .connect(new Tone.Delay("16n").toDestination())
-  .connect(new Tone.Delay("16n").toDestination())
-  .connect(new Tone.Delay("4n").toDestination())
-  .connect(new Tone.Delay("16n").toDestination())
   .connect(new Tone.Delay("16n").toDestination())
   .connect(new Tone.Freeverb(0.4).toDestination())
   .toDestination();
