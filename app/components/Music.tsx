@@ -25,6 +25,14 @@ export default function Music(props: MusicProps): React.ReactElement {
   const [duration] = useState<number>(4);
   const [bgColor, setBgColor] = useState<string>(`bg-slate-500`);
   const [chordsEnabled, setChordsEnabled] = useState<boolean>(false);
+
+  const [iterations, setIterations] = useState<number>(0);
+
+  const [touchStart, setTouchStart] = useState<Record<string, number>>({
+    mouse: -1,
+    touch: -1,
+  });
+
   const [activeHighNotes, setActiveHighNotes] = useState<
     (Notey & { x: number })[]
   >([]);
@@ -70,9 +78,13 @@ export default function Music(props: MusicProps): React.ReactElement {
         duration={duration}
         enabled={loopEnabled}
         onComplete={() => {
-          const newScale = Collection.shuffle(Scale.names())[0];
-          setScaleName(newScale);
-          return newScale;
+          setIterations(iterations + 1);
+          if (iterations % 4 === 0) {
+            const newScale = Collection.shuffle(Scale.names())[0];
+            setScaleName(newScale);
+            return newScale;
+          }
+          return scaleName;
         }}
         onPlayNote={(note) => {
           const freq = Note.get(String(note.note).split(",")?.[0]).freq;
@@ -99,23 +111,74 @@ export default function Music(props: MusicProps): React.ReactElement {
         className={`${bgColor} col-span-12 transition-colors relative duration-[${
           (1 / duration) * 10_000
         }ms]`}
+        onTouchStart={(ev) => {
+          setTouchStart({
+            ...touchStart,
+            touch: ev.timeStamp,
+          });
+        }}
+        onTouchEnd={(ev) => {
+          if (touchStart.touch > -1) {
+            const touchLength = ev.timeStamp - touchStart.mouse;
+            // const x =
+            //   (ev.pageX - ev.currentTarget.offsetLeft) /
+            //   ev.currentTarget.offsetWidth;
+            // const y =
+            //   (ev.pageY - ev.currentTarget.offsetTop) /
+            //   ev.currentTarget.offsetHeight;
+            [...Array.from(ev.changedTouches)].forEach((touch) => {
+              const x = touch.clientX / ev.currentTarget.offsetWidth;
+              const y = touch.clientY / ev.currentTarget.offsetHeight;
+              console.log(ev);
+              const notes = getNotes(Scale.get(`${root} ${scaleName}`));
+              const newNote = Collection.shuffle(notes)[0];
+              const note = {
+                note: newNote.note,
+                delay: 0,
+                duration:
+                  Math.floor(Math.random() * (touchLength / 24)) / duration,
+                x,
+                y,
+              };
+              playUserNote(note, true);
+            });
+            setTouchStart({
+              ...touchStart,
+              touch: -1,
+            });
+          }
+        }}
+        onMouseUp={async (ev) => {
+          if (touchStart.mouse > -1) {
+            const touchLength = ev.timeStamp - touchStart.mouse;
+            const x =
+              (ev.pageX - ev.currentTarget.offsetLeft) /
+              ev.currentTarget.offsetWidth;
+            const y =
+              (ev.pageY - ev.currentTarget.offsetTop) /
+              ev.currentTarget.offsetHeight;
+            const notes = getNotes(Scale.get(`${root} ${scaleName}`));
+            const newNote = Collection.shuffle(notes)[0];
+            const note = {
+              note: newNote.note,
+              delay: 0,
+              duration:
+                Math.floor(Math.random() * (touchLength / 6)) / duration,
+              x,
+              y,
+            };
+            playUserNote(note, true);
+            setTouchStart({
+              ...touchStart,
+              mouse: -1,
+            });
+          }
+        }}
         onMouseDown={async (ev) => {
-          const x =
-            (ev.pageX - ev.currentTarget.offsetLeft) /
-            ev.currentTarget.offsetWidth;
-          const y =
-            (ev.pageY - ev.currentTarget.offsetTop) /
-            ev.currentTarget.offsetHeight;
-          const notes = getNotes(Scale.get(`${root} ${scaleName}`));
-          const newNote = Collection.shuffle(notes)[0];
-          const note = {
-            note: newNote.note,
-            delay: 0,
-            duration: 1 / duration,
-            x,
-            y,
-          };
-          playUserNote(note, true);
+          setTouchStart({
+            ...touchStart,
+            mouse: ev.timeStamp,
+          });
         }}
       >
         <div className="absolute top-0 bottom-0 left-0 right-0 bg-red overflow-hidden">

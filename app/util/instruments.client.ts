@@ -1,6 +1,6 @@
 import * as Tone from "tone";
 
-Tone.setContext(new Tone.Context({ lookAhead: 1 }));
+Tone.setContext(new Tone.Context({ lookAhead: 0.1 }));
 
 export const lowSynth = new Tone.MonoSynth({
   volume: -30,
@@ -94,6 +94,6 @@ export const userSynth = new Tone.DuoSynth({
 })
   .connect(new Tone.Freeverb(0.4).toDestination())
   .connect(new Tone.Reverb(12).toDestination())
-  .connect(new Tone.Delay("16n").toDestination())
   .connect(new Tone.Freeverb(0.4).toDestination())
+  .connect(new Tone.AmplitudeEnvelope("4n", "2n", 1, "4n").toDestination())
   .toDestination();
