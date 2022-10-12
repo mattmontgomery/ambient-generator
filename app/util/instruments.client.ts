@@ -1,9 +1,20 @@
 import * as Tone from "tone";
 
-Tone.setContext(new Tone.Context({ lookAhead: 0.1 }));
+Tone.setContext(new Tone.Context({ lookAhead: 0.1, clockSource: "worker" }));
+
+const compressor = new Tone.MultibandCompressor({
+  lowFrequency: 200,
+  highFrequency: 5000,
+  low: {
+    threshold: -30,
+  },
+  high: {
+    threshold: -50,
+  },
+});
 
 export const lowSynth = new Tone.MonoSynth({
-  volume: -30,
+  volume: -25,
   oscillator: {
     type: "sine",
   },
@@ -23,14 +34,40 @@ export const lowSynth = new Tone.MonoSynth({
     exponent: 1.2,
   },
 })
-  .connect(new Tone.Delay("4n").toDestination())
   .connect(new Tone.Reverb(188).toDestination())
-  .connect(new Tone.Delay("4n").toDestination())
-  .connect(new Tone.Freeverb(0.1).toDestination())
+  .connect(new Tone.Freeverb(0.4).toDestination())
+  .connect(compressor.toDestination())
   .toDestination();
 
+export const midSynth = new Tone.MonoSynth({
+  volume: -30,
+  oscillator: {
+    type: "triangle",
+  },
+  envelope: {
+    attack: 10,
+    decay: 10,
+    sustain: 0.8,
+    release: 10,
+  },
+  filterEnvelope: {
+    attack: 1.06,
+    decay: 0.9,
+    sustain: 0.5,
+    release: 20,
+    baseFrequency: 100,
+    octaves: 6,
+    exponent: 1.2,
+  },
+})
+  .connect(new Tone.Freeverb(0.4).toDestination())
+  .connect(new Tone.Reverb(188).toDestination())
+  .connect(new Tone.Delay("32n").toDestination())
+  .connect(new Tone.Freeverb(0.8).toDestination())
+  .connect(compressor.toDestination())
+  .toDestination();
 export const highSynth = new Tone.MonoSynth({
-  volume: -40,
+  volume: -30,
   oscillator: {
     type: "sine",
   },
@@ -54,11 +91,12 @@ export const highSynth = new Tone.MonoSynth({
   .connect(new Tone.Reverb(12).toDestination())
   .connect(new Tone.Delay("32n").toDestination())
   .connect(new Tone.Freeverb(0.8).toDestination())
+  .connect(compressor.toDestination())
   .toDestination();
 
 export const userSynth = new Tone.DuoSynth({
   harmonicity: 1,
-  volume: -35,
+  volume: -10,
   voice0: {
     oscillator: { type: "sawtooth", partialCount: 1 },
     envelope: {
@@ -95,5 +133,5 @@ export const userSynth = new Tone.DuoSynth({
   .connect(new Tone.Freeverb(0.4).toDestination())
   .connect(new Tone.Reverb(12).toDestination())
   .connect(new Tone.Freeverb(0.4).toDestination())
-  .connect(new Tone.AmplitudeEnvelope("4n", "2n", 1, "4n").toDestination())
+  .connect(compressor.toDestination())
   .toDestination();

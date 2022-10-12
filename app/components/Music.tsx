@@ -1,5 +1,10 @@
 import { useCallback, useEffect, useState } from "react";
-import { highSynth, lowSynth, userSynth } from "~/util/instruments.client";
+import {
+  highSynth,
+  lowSynth,
+  midSynth,
+  userSynth,
+} from "~/util/instruments.client";
 import { Note, Collection, Scale } from "@tonaljs/tonal";
 import { useFetcher } from "@remix-run/react";
 import type Pusher from "pusher-js";
@@ -20,19 +25,16 @@ export default function Music(props: MusicProps): React.ReactElement {
 
   const [root] = useState<string>("D4");
   const [loopRoot] = useState<string>("D2");
+  const [midRoot] = useState<string>("D3");
   const [scaleName, setScaleName] = useState<string>("enigmatic");
 
   const [loopEnabled, setLoopEnabled] = useState<boolean>(false);
   const [duration] = useState<number>(4);
   const [bgColor, setBgColor] = useState<string>(`bg-slate-500`);
   const [chordsEnabled, setChordsEnabled] = useState<boolean>(false);
+  const [midNotesEnabled, setMidNotesEnabled] = useState<boolean>(false);
 
   const [iterations, setIterations] = useState<number>(0);
-
-  const [touchStart, setTouchStart] = useState<Record<string, number>>({
-    mouse: -1,
-    touch: -1,
-  });
 
   const [activeHighNotes, setActiveHighNotes] = useState<
     (Notey & { x: number })[]
@@ -97,8 +99,21 @@ export default function Music(props: MusicProps): React.ReactElement {
       />
       <Looper
         scale={scaleName}
-        root={root}
+        root={midRoot}
         duration={duration * 2}
+        enabled={midNotesEnabled}
+        onComplete={() => scaleName}
+        onPlayNote={(note) => {
+          setActiveHighNotes([
+            { ...note, x: ((Note.get(note.note).midi ?? 0) % 8) / 8 },
+          ]);
+        }}
+        synth={midSynth}
+      />
+      <Looper
+        scale={scaleName}
+        root={root}
+        duration={duration * 4}
         enabled={chordsEnabled}
         onComplete={() => scaleName}
         onPlayNote={(note) => {
@@ -159,7 +174,16 @@ export default function Music(props: MusicProps): React.ReactElement {
                 setLoopEnabled(!loopEnabled);
               }}
             >
-              {loopEnabled ? "stop repeating" : "play"} base tones
+              {loopEnabled ? "stop" : "loop"} base tones
+            </button>
+            <button
+              className="bg-slate-700 text-white rounded p-4"
+              onClick={(ev) => {
+                ev.stopPropagation();
+                setMidNotesEnabled(!midNotesEnabled);
+              }}
+            >
+              {!midNotesEnabled ? "loop" : "stop"} mid tones
             </button>
             <button
               className="bg-slate-700 text-white rounded p-4"
@@ -168,7 +192,7 @@ export default function Music(props: MusicProps): React.ReactElement {
                 setChordsEnabled(!chordsEnabled);
               }}
             >
-              {!chordsEnabled ? "play high tones" : "stop high tones"}
+              {!chordsEnabled ? "loop" : "stop"} high tones
             </button>
             <div className="p-4">
               volume
