@@ -8,6 +8,7 @@ import type { Notey } from "~/util/music.client";
 import { Looper } from "./Looper";
 import { Dot } from "./Dot";
 import Line from "./Line";
+import UserTouch from "./UserTouch";
 
 export type MusicProps = {
   pusher: Pusher;
@@ -107,78 +108,20 @@ export default function Music(props: MusicProps): React.ReactElement {
         }}
         synth={highSynth}
       />
-      <div
-        className={`${bgColor} col-span-12 transition-colors relative duration-[${
-          (1 / duration) * 10_000
-        }ms]`}
-        onTouchStart={(ev) => {
-          setTouchStart({
-            ...touchStart,
-            touch: ev.timeStamp,
-          });
-        }}
-        onTouchEnd={(ev) => {
-          if (touchStart.touch > -1) {
-            const touchLength = ev.timeStamp - touchStart.mouse;
-            // const x =
-            //   (ev.pageX - ev.currentTarget.offsetLeft) /
-            //   ev.currentTarget.offsetWidth;
-            // const y =
-            //   (ev.pageY - ev.currentTarget.offsetTop) /
-            //   ev.currentTarget.offsetHeight;
-            [...Array.from(ev.changedTouches)].forEach((touch) => {
-              const x = touch.clientX / ev.currentTarget.offsetWidth;
-              const y = touch.clientY / ev.currentTarget.offsetHeight;
-              console.log(ev);
-              const notes = getNotes(Scale.get(`${root} ${scaleName}`));
-              const newNote = Collection.shuffle(notes)[0];
-              const note = {
-                note: newNote.note,
-                delay: 0,
-                duration:
-                  Math.floor(Math.random() * (touchLength / 24)) / duration,
-                x,
-                y,
-              };
-              playUserNote(note, true);
-            });
-            setTouchStart({
-              ...touchStart,
-              touch: -1,
-            });
-          }
-        }}
-        onMouseUp={async (ev) => {
-          if (touchStart.mouse > -1) {
-            const touchLength = ev.timeStamp - touchStart.mouse;
-            const x =
-              (ev.pageX - ev.currentTarget.offsetLeft) /
-              ev.currentTarget.offsetWidth;
-            const y =
-              (ev.pageY - ev.currentTarget.offsetTop) /
-              ev.currentTarget.offsetHeight;
-            const notes = getNotes(Scale.get(`${root} ${scaleName}`));
-            const newNote = Collection.shuffle(notes)[0];
-            const note = {
-              note: newNote.note,
-              delay: 0,
-              duration:
-                Math.floor(Math.random() * (touchLength / 6)) / duration,
-              x,
-              y,
-            };
-            playUserNote(note, true);
-            setTouchStart({
-              ...touchStart,
-              mouse: -1,
-            });
-          }
-        }}
-        onMouseDown={async (ev) => {
-          setTouchStart({
-            ...touchStart,
-            mouse: ev.timeStamp,
-          });
+      <UserTouch
+        bgColor={bgColor}
+        duration={duration}
+        onPlayNote={(x, y, touchLength) => {
+          const notes = getNotes(Scale.get(`${root} ${scaleName}`));
+          const newNote = Collection.shuffle(notes)[0];
+          const note = {
+            note: newNote.note,
+            delay: 0,
+            duration: Math.floor(Math.random() * (touchLength / 24)) / duration,
+            x,
+            y,
+          };
+          playUserNote(note, true);
         }}
       >
         <div className="absolute top-0 bottom-0 left-0 right-0 bg-red overflow-hidden">
@@ -193,7 +136,11 @@ export default function Music(props: MusicProps): React.ReactElement {
           {root} {scaleName}
         </div>
         <div className="absolute">
-          <div className="grid gap-1 col-span-2">
+          <div
+            className="grid gap-1 col-span-2"
+            onMouseDown={(ev) => ev.stopPropagation()}
+            onMouseUp={(ev) => ev.stopPropagation()}
+          >
             <select
               value={scaleName}
               onChange={(ev) => {
@@ -207,7 +154,8 @@ export default function Music(props: MusicProps): React.ReactElement {
             </select>
             <button
               className="bg-slate-800 text-white rounded p-4"
-              onClick={() => {
+              onClick={(ev) => {
+                ev.stopPropagation();
                 setLoopEnabled(!loopEnabled);
               }}
             >
@@ -215,7 +163,10 @@ export default function Music(props: MusicProps): React.ReactElement {
             </button>
             <button
               className="bg-slate-700 text-white rounded p-4"
-              onClick={() => setChordsEnabled(!chordsEnabled)}
+              onClick={(ev) => {
+                ev.stopPropagation();
+                setChordsEnabled(!chordsEnabled);
+              }}
             >
               {!chordsEnabled ? "play high tones" : "stop high tones"}
             </button>
@@ -236,7 +187,7 @@ export default function Music(props: MusicProps): React.ReactElement {
             </div>
           </div>
         </div>
-      </div>
+      </UserTouch>
     </div>
   );
 }

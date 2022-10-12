@@ -60,7 +60,7 @@ export const userSynth = new Tone.DuoSynth({
   harmonicity: 1,
   volume: -35,
   voice0: {
-    oscillator: { type: "sawtooth" },
+    oscillator: { type: "sawtooth", partialCount: 1 },
     envelope: {
       attack: 0.1,
       release: 4,
