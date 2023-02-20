@@ -23,7 +23,7 @@
     "tone": "14.7.77"
   },
   "devDependencies": {
-    "@remix-run/dev": "^1.7.2",
+    "@remix-run/dev": "^1.13.0",
     "@remix-run/eslint-config": "^1.7.2",
     "@remix-run/vercel": "^1.7.2",
     "@types/react": "^18.0.15",
